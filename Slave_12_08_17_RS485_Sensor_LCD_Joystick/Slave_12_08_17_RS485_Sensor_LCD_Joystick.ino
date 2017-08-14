@@ -181,13 +181,13 @@ void loop() {
     {
       dp++;
       out = millis();
-      if (dp > 5) dp = 0;
+      if (dp > 9) dp = 0;
     }
     else if (readjs() == Left)
     {
       dp--;
       out = millis();
-      if (dp < 0) dp = 5;
+      if (dp < 0) dp = 9;
     }
     switch (dp) {
       case 0:
@@ -207,6 +207,18 @@ void loop() {
         break;
       case 5:
         displaydp("    Setting   ", "TimeRL34 =      ");
+        break;
+          case 6:
+        displaydp("    Setting   ", "Upper 1 <=      ");
+        break;
+      case 7:
+        displaydp("    Setting   ", "Lower 1 >=      ");
+        break;
+      case 8:
+        displaydp("    Setting   ", "Upper 2 <=      ");
+        break;
+      case 9:
+        displaydp("    Setting   ", "Lower 2 >=      ");
         break;
       default:
         break;
