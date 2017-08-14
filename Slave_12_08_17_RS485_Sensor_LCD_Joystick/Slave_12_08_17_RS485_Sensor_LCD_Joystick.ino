@@ -249,8 +249,8 @@ void loop() {
         else if (readjs() == Down)  dt1 -= 0.01;
         break;
       case 1:
-        if (readjs() == Up) dt1 += 0.01;
-        else if (readjs() == Down)  dt1 -= 0.01;
+        if (readjs() == Up) dh1 += 0.01;
+        else if (readjs() == Down)  dh1 -= 0.01;
         break;
       default:
         break;
