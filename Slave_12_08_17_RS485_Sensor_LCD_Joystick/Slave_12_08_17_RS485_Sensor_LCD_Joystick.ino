@@ -31,6 +31,7 @@ float h1, t1, f1, h2, t2, f2;
 signed int _h1, _t1, _f1, _h2, _t2, _f2; // Convert from float to int
 unsigned long tempms;
 int sensor;
+float dt1 = 0.0, dh1 =  0.0, dt2 =  0.0, ht2 =  0.0;
 //***************** End Sensor DHT *****************//
 
 //***************** Begin LCD *****************//
@@ -38,6 +39,7 @@ int sensor;
 
 LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
 unsigned long delayclr, out;
+int change = -1;
 //***************** End LCD *****************//
 
 //***************** Begin Joystick *****************//
@@ -63,6 +65,8 @@ void clearlcd(int t);
 void outmode(int t);
 void displaydp(String text1, String text2);
 int readjs();
+void blinkCursor();
+void check(int value);
 //***************** Declare Subroutines *****************//
 
 void setup() {
@@ -181,26 +185,38 @@ void loop() {
     {
       dp++;
       out = millis();
-      if (dp > 9) dp = 0;
+      if (dp > 10) dp = 0;
     }
     else if (readjs() == Left)
     {
       dp--;
       out = millis();
-      if (dp < 0) dp = 9;
+      if (dp < 0) dp = 10;
     }
     switch (dp) {
       case 0:
         displaydp("    Setting   ", "Delta T1 =      ");
+        lcd.setCursor(11, 1);
+        lcd.print(dt1);
+        check(0);
         break;
       case 1:
         displaydp("    Setting   ", "Delta H1 =      ");
+        lcd.setCursor(11, 1);
+        lcd.print(dh1);
+        check(1);
         break;
       case 2:
         displaydp("    Setting   ", "Delta T2 =      ");
+        lcd.setCursor(11, 1);
+        lcd.print(dt2);
+        check(2);
         break;
       case 3:
         displaydp("    Setting   ", "Delta H2 =      ");
+        lcd.setCursor(11, 1);
+        lcd.print(dh2);
+        check(3);
         break;
       case 4:
         displaydp("    Setting   ", "TimeRL12 =      ");
@@ -208,7 +224,7 @@ void loop() {
       case 5:
         displaydp("    Setting   ", "TimeRL34 =      ");
         break;
-          case 6:
+      case 6:
         displaydp("    Setting   ", "Upper 1 <=      ");
         break;
       case 7:
@@ -219,6 +235,22 @@ void loop() {
         break;
       case 9:
         displaydp("    Setting   ", "Lower 2 >=      ");
+        break;
+      case 10:
+        displaydp("    Setting   ", "  Exit Setting  ");
+        break;
+      default:
+        break;
+    }
+    switch (change)
+    {
+      case 0:
+        if (readjs() == Up) dt1 += 0.01;
+        else if (readjs() == Down)  dt1 -= 0.01;
+        break;
+      case 1:
+        if (readjs() == Up) dt1 += 0.01;
+        else if (readjs() == Down)  dt1 -= 0.01;
         break;
       default:
         break;
@@ -292,3 +324,22 @@ int readjs()
   else return 0;
 }
 
+void blinkCursor()
+{
+  lcd.noCursor();
+  delay(200);
+  // Turn on the cursor:
+  lcd.cursor();
+  delay(200);
+}
+
+void check(int value)
+{
+  if (readjs() == Press)
+    change = value;
+  if (change > 0)
+  {
+    lcd.setCursor(11, 1);
+    blinkCursor();
+  }
+}
