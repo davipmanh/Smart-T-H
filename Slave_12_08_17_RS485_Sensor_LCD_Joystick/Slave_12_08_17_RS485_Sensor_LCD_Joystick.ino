@@ -1,6 +1,6 @@
 /* PROJECT: SLAVE/RS485/MODBUS RTU
    AUTHOR: DAVIP MANH
-   DADE: 14/08/2017
+   DADE: 15/08/2017
    VERSION: 1.0
 */
 
@@ -68,6 +68,7 @@ void displaydp(String text1, String text2);
 int readjs();
 void blinkCursor();
 void check(int value);
+void UpdateValue(int x, float t);
 //***************** Declare Subroutines *****************//
 
 void setup() {
@@ -248,13 +249,35 @@ void loop() {
     switch (change)
     {
       case 0:
-        if (readjs() == Up) dt1 += 0.01;
-        else if (readjs() == Down)  dt1 -= 0.01;
+        UpdateValue(dt1, 0.1);
         break;
       case 1:
-        if (readjs() == Up) dh1 += 0.01;
-        else if (readjs() == Down)  dh1 -= 0.01;
+        UpdateValue(dh1, 0.1);
         break;
+      case 2:
+        UpdateValue(dt2, 0.1);
+        break;
+      case 3:
+        UpdateValue(dh2, 0.1);
+        break;
+      case 4:
+        UpdateValue(time1, 1);
+        break; 
+      case 5:
+        UpdateValue(time2, 1);
+        break;  
+      case 6:
+        UpdateValue(up1, 0.5);
+        break;    
+      case 7:
+        UpdateValue(low1, 0.5);
+        break; 
+      case 8:
+        UpdateValue(up2, 0.5);
+        break;  
+      case 9:
+        UpdateValue(low2, 0.5);
+        break;      
       default:
         break;
     }
@@ -345,4 +368,18 @@ void check(int value)
     lcd.setCursor(11, 1);
     blinkCursor();
   }
+}
+
+void UpdateValue(int x, float t)
+{
+   if (readjs() == Up) 
+        {
+           out = millis();
+           x += t;
+        }
+        else if (readjs() == Down)
+        {
+           out = millis();
+           x -= t;
+        }
 }
