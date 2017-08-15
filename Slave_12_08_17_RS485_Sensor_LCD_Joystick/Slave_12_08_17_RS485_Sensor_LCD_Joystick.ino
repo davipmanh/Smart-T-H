@@ -1,6 +1,6 @@
 /* PROJECT: SLAVE/RS485/MODBUS RTU
    AUTHOR: DAVIP MANH
-   DADE: 12/08/2017
+   DADE: 14/08/2017
    VERSION: 1.0
 */
 
@@ -31,7 +31,7 @@ float h1, t1, f1, h2, t2, f2;
 signed int _h1, _t1, _f1, _h2, _t2, _f2; // Convert from float to int
 unsigned long tempms;
 int sensor;
-float dt1 = 0.0, dh1 =  0.0, dt2 =  0.0, ht2 =  0.0;
+float dt1 = 0.0, dh1 =  0.0, dt2 =  0.0, dh2 =  0.0;
 //***************** End Sensor DHT *****************//
 
 //***************** Begin LCD *****************//
@@ -40,6 +40,7 @@ float dt1 = 0.0, dh1 =  0.0, dt2 =  0.0, ht2 =  0.0;
 LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
 unsigned long delayclr, out;
 int change = -1;
+int counter;
 //***************** End LCD *****************//
 
 //***************** Begin Joystick *****************//
@@ -55,7 +56,7 @@ int change = -1;
 
 
 //#define JSSW  !digitalRead(SW)
-bool seen = 1;
+bool seen = 1, old_seen = 1;
 int mode = 0, dp = 0, dp1 = 1, dp2 = 1, dp3 = 1;
 //***************** End Joystick *****************//
 
@@ -93,11 +94,13 @@ void setup() {
 }
 
 void loop() {
-  if (readjs() > 1)
+  if (readjs() == Right || readjs() == Left)
   {
+    delay(220);
     seen = !seen;
-    delay(300);
+    delay(30);
   }
+
   if (readjs() == Press) mode = 1;
   if (mode == 0)
   {
@@ -316,8 +319,8 @@ int readjs()
   int readAX = analogRead(AX);
   int readAY = analogRead(AY);
   bool readSW = digitalRead(SW);
-  if (readAX < 330) return Left;
-  else if (readAX > 410) return Right;
+  if (readAX < 360) return Left;
+  else if (readAX > 390) return Right;
   if (readAY < 330) return Up;
   else if (readAY > 410) return Down;
   if (!readSW) return Press;
