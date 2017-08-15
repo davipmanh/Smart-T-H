@@ -31,7 +31,8 @@ float h1, t1, f1, h2, t2, f2;
 signed int _h1, _t1, _f1, _h2, _t2, _f2; // Convert from float to int
 unsigned long tempms;
 int sensor;
-float dt1 = 0.0, dh1 =  0.0, dt2 =  0.0, dh2 =  0.0;
+float dt1 = 0.0, dh1 =  0.0, dt2 =  0.0, dh2 =  0.0, up1 = 40, low1 = 25, up2 = 40, low2 = 25;
+unsigned int time1 = 5000, time2 = 5000;
 //***************** End Sensor DHT *****************//
 
 //***************** Begin LCD *****************//
@@ -60,6 +61,16 @@ bool seen = 1, old_seen = 1;
 int mode = 0, dp = 0, dp1 = 1, dp2 = 1, dp3 = 1;
 //***************** End Joystick *****************//
 
+//***************** Begin Declare Relay *****************//
+#define RL1      8
+#define RL2      9
+#define RL3      10
+#define RL4      11
+
+unsigned long timeOnRL;
+
+//***************** End Declare Relay *****************//
+
 //***************** Declare Subroutines *****************//
 void io_poll();
 void clearlcd(int t);
@@ -69,6 +80,7 @@ int readjs();
 void blinkCursor();
 void check(int value);
 void UpdateValue(int x, float t);
+
 //***************** Declare Subroutines *****************//
 
 void setup() {
@@ -92,6 +104,19 @@ void setup() {
   //delay(1000);
   lcd.clear();
   delayclr = millis();
+
+  //Setup Relay
+  pinMode(RL1, OUTPUT);
+  pinMode(RL2, OUTPUT);
+  pinMode(RL3, OUTPUT);
+  pinMode(RL4, OUTPUT);
+
+  digitalWrite(RL1, LOW);
+  digitalWrite(RL2, LOW);
+  digitalWrite(RL3, LOW);
+  digitalWrite(RL4, LOW);
+
+  timeOnRL = millis();
 }
 
 void loop() {
@@ -136,22 +161,22 @@ void loop() {
         if (isnan(h1) || isnan(t1) || isnan(f1))
         {
           lcd.setCursor(4, 0);
-          lcd.print("Sensor 1");
+          lcd.print("    Sensor 1    ");
           lcd.setCursor(0, 1);
           lcd.print("   No Device!   ");
         }
         else
         {
-          clearlcd(3000);
+          //clearlcd(3000);
           lcd.setCursor(4, 0);
-          lcd.print("Sensor 1");
+          lcd.print("    Sensor 1    ");
           lcd.setCursor(0, 1);
           lcd.print(t1);
           lcd.write(223); // Icon 0 - 1101 1111 - 0xDF
-          lcd.print("C");
+          lcd.print("C  ");
           lcd.setCursor(9, 1);
           lcd.print(h1);
-          lcd.print("%");
+          lcd.print("%  ");
         }
       }
       else
@@ -159,25 +184,41 @@ void loop() {
         if (isnan(h2) || isnan(t2) || isnan(f2))
         {
           lcd.setCursor(4, 0);
-          lcd.print("Sensor 2");
+          lcd.print("    Sensor 2    ");
           lcd.setCursor(0, 1);
           lcd.print("   No Device!   ");
         }
         else
         {
-          clearlcd(3000);
+          //clearlcd(3000);
           lcd.setCursor(4, 0);
-          lcd.print("Sensor 2");
+          lcd.print("    Sensor 2    ");
           lcd.setCursor(0, 1);
           lcd.print(t2);
           lcd.write(223); // Icon 0 - 1101 1111 - 0xDF
-          lcd.print("C");
+          lcd.print("C  ");
           lcd.setCursor(9, 1);
           lcd.print(h2);
-          lcd.print("%");
+          lcd.print("%  ");
         }
       }
       tempms = millis() + timeread;
+    }
+    if (dt1 >= up1)
+    {
+      On_RL(1, time1);
+    }
+    else if (dt1 <= low1)
+    {
+      On_RL(2, time1);
+    }
+    if (dt2 >= up2)
+    {
+      On_RL(3, time2);
+    }
+    else if (dt2 <= low2)
+    {
+      On_RL(4, time2);
     }
     //Poll messages RS485
     slave.poll( au16data, NumberData );
@@ -262,22 +303,22 @@ void loop() {
         break;
       case 4:
         UpdateValue(time1, 1);
-        break; 
+        break;
       case 5:
         UpdateValue(time2, 1);
-        break;  
+        break;
       case 6:
         UpdateValue(up1, 0.5);
-        break;    
+        break;
       case 7:
         UpdateValue(low1, 0.5);
-        break; 
+        break;
       case 8:
         UpdateValue(up2, 0.5);
-        break;  
+        break;
       case 9:
         UpdateValue(low2, 0.5);
-        break;      
+        break;
       default:
         break;
     }
@@ -372,14 +413,62 @@ void check(int value)
 
 void UpdateValue(int x, float t)
 {
-   if (readjs() == Up) 
-        {
-           out = millis();
-           x += t;
-        }
-        else if (readjs() == Down)
-        {
-           out = millis();
-           x -= t;
-        }
+  if (readjs() == Up)
+  {
+    out = millis();
+    x += t;
+  }
+  else if (readjs() == Down)
+  {
+    out = millis();
+    x -= t;
+  }
+}
+void OnRL(int rl, int t)
+{
+  if (rl = 1)
+  {
+    if (millis() > timeOnRL1 + time1)
+    {
+      if (t1 > up1)
+      {
+        digitalWrite(RL1, HIGH);
+        timeOnRL1 = millis();
+      }
+      else digitalWrite(RL1, LOW);
+    }
+  }
+  else if (rl = 2)
+  {
+    if (millis() > timeOnRL2 + time2)
+    {
+      if (h1 > up2)
+      {
+        digitalWrite(RL2; , HIGH);
+        timeOnRL2 = millis();
+      }
+    }
+  }
+  else if (rl = 3)
+  {
+    if (millis() > timeOnRL3 + time3)
+    {
+      if (t2 > up1)
+      {
+        digitalWrite(RL1, HIGH);
+        timeOnRL1 = millis();
+      }
+    }
+  }
+  else if (rl = 2)
+  {
+    if (millis() > timeOnRL2 + time2)
+    {
+      if (h2 > up2)
+      {
+        digitalWrite(RL2; , HIGH);
+        timeOnRL2 = millis();
+      }
+    }
+  }
 }
