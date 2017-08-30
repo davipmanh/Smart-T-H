@@ -602,8 +602,8 @@ void io_poll() {
     dh1 = au16data[7];
     dt2 = au16data[8];
     dh2 = au16data[9];
-    time1 = au16data[10];
-    time2 = au16data[11];
+    time1 = au16data[10]*1000;
+    time2 = au16data[11]*1000;
     up1 = au16data[12];
     low1 = au16data[13];
     up2 = au16data[14];
@@ -615,8 +615,8 @@ void io_poll() {
     au16data[7] = dh1 ;
     au16data[8] = dt2 ;
     au16data[9] = dh2;
-    au16data[10] = time1 ;
-    au16data[11] = time2;
+    au16data[10] = time1/1000;
+    au16data[11] = time2/1000;
     au16data[12] = up1;
     au16data[13] = low1;
     au16data[14] = up2;
